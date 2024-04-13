@@ -6,18 +6,21 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Document
+@Document("posts")
 public class Post {
     @Id
     private String id;
     private String title;
     private String content;
-    private LocalDateTime createdAt;
+    private LocalDateTime dateTimeCreated;
+    private String userId;
+    private LocalDateTime dateTimeUpdated;
     @DBRef
-    private List<View> views;
+    private List<View> views = new ArrayList<>();
     @DBRef
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 }

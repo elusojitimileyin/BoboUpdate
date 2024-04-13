@@ -3,7 +3,7 @@ package News.Company.BoboUpdate.Dtos.request;
 import lombok.Data;
 
 @Data
-public class SignOutRequest {
+public class DeleteCommentRequest {
+    private String commentId;
     private String username;
-    private String password;
 }

@@ -1,13 +1,23 @@
 package News.Company.BoboUpdate.Services;
 
-import News.Company.BoboUpdate.Dtos.request.SignInRequest;
-import News.Company.BoboUpdate.Dtos.request.SignOutRequest;
-import News.Company.BoboUpdate.Dtos.request.SignUpRequest;
+import News.Company.BoboUpdate.Data.Model.User;
+import News.Company.BoboUpdate.Dtos.request.LoginUserRequest;
+import News.Company.BoboUpdate.Dtos.request.LogoutUserRequest;
+import News.Company.BoboUpdate.Dtos.request.RegisterUserRequest;
+import News.Company.BoboUpdate.Dtos.request.UpdateUserRequest;
+import News.Company.BoboUpdate.Dtos.response.LoginUserResponse;
+import News.Company.BoboUpdate.Dtos.response.LogoutUserResponse;
+import News.Company.BoboUpdate.Dtos.response.RegisterUserResponse;
+import News.Company.BoboUpdate.Dtos.response.UpdateUserResponse;
 
 public interface UserService {
-    void registerUser(SignUpRequest signUpRequest);
+    RegisterUserResponse registerUser(RegisterUserRequest signUpRequest);
 
-    void login(SignInRequest signInRequest);
+    LoginUserResponse login(LoginUserRequest loginUserRequest);
 
-    void logout (SignOutRequest signOutRequest);
+    LogoutUserResponse logout(LogoutUserRequest logoutUserRequest);
+
+    User findUserBy(String username);
+
+    UpdateUserResponse updateUserBio(UpdateUserRequest updateUserRequest);
 }

@@ -1,69 +1,89 @@
 package News.Company.BoboUpdate.Services;
-
+import News.Company.BoboUpdate.BoboUpdateException.BoboUpdateException;
+import News.Company.BoboUpdate.BoboUpdateException.UserExistException;
+import News.Company.BoboUpdate.BoboUpdateException.UserNotFoundException;
 import News.Company.BoboUpdate.Data.Model.User;
 import News.Company.BoboUpdate.Data.Repositories.UserRepository;
-import News.Company.BoboUpdate.Dtos.request.SignInRequest;
-import News.Company.BoboUpdate.Dtos.request.SignOutRequest;
-import News.Company.BoboUpdate.Dtos.request.SignUpRequest;
+import News.Company.BoboUpdate.Dtos.request.LoginUserRequest;
+import News.Company.BoboUpdate.Dtos.request.LogoutUserRequest;
+import News.Company.BoboUpdate.Dtos.request.RegisterUserRequest;
+import News.Company.BoboUpdate.Dtos.request.UpdateUserRequest;
+import News.Company.BoboUpdate.Dtos.response.LoginUserResponse;
+import News.Company.BoboUpdate.Dtos.response.LogoutUserResponse;
+import News.Company.BoboUpdate.Dtos.response.RegisterUserResponse;
+import News.Company.BoboUpdate.Dtos.response.UpdateUserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
+
+import static News.Company.BoboUpdate.Utils.Mapper.map;
+import static News.Company.BoboUpdate.Utils.Mapper.mapUpdateUserResponse;
 
 @Service
-public class UserServiceImp implements UserService{
+public class UserServiceImp implements UserService {
     @Autowired
-    private UserRepository userRepositories; 
+    private UserRepository userRepositories;
+
     @Override
-    public void registerUser(SignUpRequest signUpRequest) {
-        if (validateRegistration(signUpRequest)){
-            User user = new User();
-            user.setFirstName(signUpRequest.getFirstName());
-            user.setLastName(signUpRequest.getLastName());
-            user.setUsername(signUpRequest.getUsername());
-            user.setPassword(signUpRequest.getPassword());
-            userRepositories.save(user);
-        }else {
-            throw new IllegalArgumentException("Registration Failed");
+    public RegisterUserResponse registerUser(RegisterUserRequest registerUserRequest) {
+        String username = registerUserRequest.getUsername().toLowerCase();
+        registerUserRequest.setUsername(username);
+        validate(username.toLowerCase());
+        User myUser = map(registerUserRequest);
+        userRepositories.save(myUser);
+
+        return map(myUser);
+    }
+
+    public LoginUserResponse login(LoginUserRequest loginRequest) throws BoboUpdateException {
+        User user = userRepositories.findByUsername(loginRequest.getUsername());
+        if (user == null || !user.getPassword().equals(loginRequest.getPassword())) {
+            throw new BoboUpdateException("Invalid username or password");
         }
-        
-    }
+        LoginUserResponse response = new LoginUserResponse();
+        response.setUsername(user.getUsername());
 
-    private boolean validateRegistration(SignUpRequest signUpRequest) {
-    return validateFirstName(signUpRequest.getFirstName()) &&
-        validateLastName(signUpRequest.getLastName())&&
-        validateUsername(signUpRequest.getUsername())&&
-        validatePassword(signUpRequest.getPassword());
-
-    }
-
-    private boolean validatePassword(String password) {
-        return password != null && !password.isEmpty();
-    }
-
-    private boolean validateUsername(String username) {
-        return username != null && !username.isEmpty();
-    }
-
-    private boolean validateLastName(String lastName) {
-        return lastName != null && !lastName.isEmpty();
-    }
-
-    private boolean validateFirstName(String firstName) {
-        return firstName != null && !firstName.isEmpty();
+        return response;
     }
 
     @Override
-    public void login(SignInRequest signInRequest) {
-        Optional<User> userOptional = userRepositories.findById(signInRequest.getUsername());
-        userOptional.filter(user -> user.getPassword().equals(signInRequest.getPassword()));
-
+    public LogoutUserResponse logout(LogoutUserRequest logoutUserRequest) {
+        String username = logoutUserRequest.getUsername().toLowerCase();
+        User user = findUserBy(username);
+        if (user == null) {
+            throw new UserNotFoundException("User with username " + username + " not found");
+        } else {
+            return new LogoutUserResponse(user.getId(), user.getUsername());
+        }
     }
 
     @Override
-    public void logout(SignOutRequest signOutRequest) {
-        Optional<User> userOptional = userRepositories.findById(signOutRequest.getUsername());
+    public User findUserBy(String username) {
+        User user = userRepositories.findByUsername(username);
+        if (user == null) {
+            throw new UserNotFoundException("User with username " + username + " not found");
+        }
+        return user;
+    }
 
 
+    private void validate(String username) {
+        boolean userExists = userRepositories.existsByUsername(username);
+        if (userExists) throw new UserExistException(String.format("%s already exists", username));
+    }
+
+    @Override
+    public UpdateUserResponse updateUserBio(UpdateUserRequest updateUserRequest) {
+        String userId = updateUserRequest.getUserId();
+        User user = userRepositories.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
+
+        user.setFirstName(updateUserRequest.getFirstname());
+        user.setLastName(updateUserRequest.getLastname());
+        user.setUsername(updateUserRequest.getUsername());
+        user.setDateRegistered(LocalDateTime.now());
+        userRepositories.save(user);
+        return mapUpdateUserResponse(user);
     }
 }

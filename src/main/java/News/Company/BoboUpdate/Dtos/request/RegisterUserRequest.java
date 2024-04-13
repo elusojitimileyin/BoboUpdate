@@ -3,7 +3,7 @@ package News.Company.BoboUpdate.Dtos.request;
 import lombok.Data;
 
 @Data
-public class SignUpRequest {
+public class RegisterUserRequest {
     private String firstName;
     private String lastName;
     private String username;
