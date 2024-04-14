@@ -1,8 +1,6 @@
 package News.Company.BoboUpdate.Utils;
 
 import News.Company.BoboUpdate.Data.Model.User;
-import News.Company.BoboUpdate.Data.Model.View;
-import News.Company.BoboUpdate.Dtos.request.CreatePostRequest;
 import News.Company.BoboUpdate.Dtos.request.RegisterUserRequest;
 import News.Company.BoboUpdate.Dtos.response.RegisterUserResponse;
 import News.Company.BoboUpdate.Dtos.response.UpdateUserResponse;
@@ -26,13 +24,6 @@ public class Mapper {
         registerUserResponse.setDateTimeRegistered(DateTimeFormatter.ofPattern("dd-MM-yyyy, hh:mm:ss").format(user.getDateRegistered()));
         return registerUserResponse;
     }
-    public static View map(CreatePostRequest createPostRequest){
-        View view = new View();
-        view.setUsername(createPostRequest.getUsername());
-        view.setTitle(createPostRequest.getTitle());
-        view.setContent(createPostRequest.getContent());
-        return view;
-    }
     public static UpdateUserResponse mapUpdateUserResponse(User user) {
         UpdateUserResponse response = new UpdateUserResponse();
         response.setUserId(user.getId());
@@ -43,5 +34,6 @@ public class Mapper {
         response.setLoggedIn(user.isLoggedIn());
         return response;
     }
+
 
 }

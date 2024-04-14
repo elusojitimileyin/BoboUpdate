@@ -26,7 +26,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<?> addPost(@RequestBody CreatePostRequest createPostRequest) {
         try {
-            CreatePostResponse createPostResponse = postService.createPostWith(createPostRequest);
+            CreatePostResponse createPostResponse = postService.createPost(createPostRequest);
             return new ResponseEntity<>(createPostResponse, CREATED);
         } catch (BoboUpdateException message) {
             return new ResponseEntity<>(message.getMessage(), BAD_REQUEST);
@@ -48,18 +48,6 @@ public class PostController {
     public ResponseEntity<?> deletePost(@RequestBody DeletePostRequest deletePostRequest) {
         try {
             var result = postService.delete(deletePostRequest);
-            return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
-        }
-        catch (BoboUpdateException message) {
-            return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
-        }
-    }
-
-
-    @PostMapping ("/view")
-        public ResponseEntity<?> viewPost(@RequestBody CreatePostRequest createPostRequest) {
-        try {
-            var result = viewService.viewPost(createPostRequest);
             return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
         }
         catch (BoboUpdateException message) {

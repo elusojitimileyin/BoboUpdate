@@ -4,7 +4,9 @@ import News.Company.BoboUpdate.BoboUpdateException.BoboUpdateException;
 import News.Company.BoboUpdate.Dtos.request.LoginUserRequest;
 import News.Company.BoboUpdate.Dtos.request.LogoutUserRequest;
 import News.Company.BoboUpdate.Dtos.request.RegisterUserRequest;
+import News.Company.BoboUpdate.Dtos.request.UpdateUserRequest;
 import News.Company.BoboUpdate.Dtos.response.ApiResponse;
+import News.Company.BoboUpdate.Dtos.response.UpdateUserResponse;
 import News.Company.BoboUpdate.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +47,16 @@ public class UserController {
             return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
         }
         catch (BoboUpdateException message) {
+            return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
+        }
+    }
+    @PatchMapping("/update")
+    public ResponseEntity<?> updateUserBio(@RequestBody UpdateUserRequest updateUserRequest) {
+
+        try {
+            UpdateUserResponse result = userService.updateUserBio(updateUserRequest);
+            return new ResponseEntity<>(new ApiResponse(true, result), CREATED);
+        } catch (BoboUpdateException message) {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
         }
     }

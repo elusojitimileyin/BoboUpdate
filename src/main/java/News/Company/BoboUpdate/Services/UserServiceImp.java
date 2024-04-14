@@ -41,10 +41,10 @@ public class UserServiceImp implements UserService {
         if (user == null || !user.getPassword().equals(loginRequest.getPassword())) {
             throw new BoboUpdateException("Invalid username or password");
         }
-        LoginUserResponse response = new LoginUserResponse();
-        response.setUsername(user.getUsername());
 
-        return response;
+        user.setLoggedIn(true);
+        userRepositories.save(user);
+        return new LoginUserResponse(user.getId(), user.getUsername().toLowerCase(),user.isLoggedIn());
     }
 
     @Override
@@ -54,7 +54,9 @@ public class UserServiceImp implements UserService {
         if (user == null) {
             throw new UserNotFoundException("User with username " + username + " not found");
         } else {
-            return new LogoutUserResponse(user.getId(), user.getUsername());
+            user.setLoggedIn(false);
+            userRepositories.save(user);
+            return new LogoutUserResponse(user.getId(), user.getUsername(),user.isLoggedIn());
         }
     }
 

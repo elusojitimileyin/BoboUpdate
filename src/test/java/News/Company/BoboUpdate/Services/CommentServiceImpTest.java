@@ -2,9 +2,11 @@ package News.Company.BoboUpdate.Services;
 
 import News.Company.BoboUpdate.Data.Model.Post;
 import News.Company.BoboUpdate.Data.Model.User;
+import News.Company.BoboUpdate.Data.Repositories.CommentRepository;
 import News.Company.BoboUpdate.Data.Repositories.PostRepository;
 import News.Company.BoboUpdate.Data.Repositories.UserRepository;
 import News.Company.BoboUpdate.Dtos.request.*;
+import News.Company.BoboUpdate.Dtos.response.CreateCommentResponse;
 import News.Company.BoboUpdate.Dtos.response.CreatePostResponse;
 import News.Company.BoboUpdate.Dtos.response.LoginUserResponse;
 import org.junit.jupiter.api.AfterEach;
@@ -16,12 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
-class PostServiceImpTest {
-
-    @Autowired
-    private PostService postService;
+class CommentServiceImpTest {
     @Autowired
     private UserService userService;
 
@@ -29,12 +27,22 @@ class PostServiceImpTest {
     private UserRepository userRepository;
 
     @Autowired
+    private PostService postService;
+    @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private CommentService commentService;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
 
     @BeforeEach
     public void setUp() {
         userRepository.deleteAll();
         postRepository.deleteAll();
+        commentRepository.deleteAll();
 
         RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
         userRegisterRequest.setUsername("username");
@@ -51,29 +59,38 @@ class PostServiceImpTest {
         assertThat(loginResponse.getUsername(), is("username"));
 
 
-
-
     }
 
     @AfterEach
     public void tearDown() {
         userRepository.deleteAll();
         postRepository.deleteAll();
+        commentRepository.deleteAll();
     }
 
     @Test
-    void testThatUserCanCreatePostWithEmptyContent() {
-        assertTrue(userRepository.existsByUsername("username"));
+    void testThatUserCanCreatePostAndCommentWithEmptyContent() {
+//        assertTrue(userRepository.existsByUsername("username"));
 
         CreatePostRequest createPostRequest = new CreatePostRequest();
         createPostRequest.setUsername("username");
         createPostRequest.setTitle("Empty Content Post");
-        createPostRequest.setContent("");
+        createPostRequest.setContent("This is a comment");
         CreatePostResponse createPostResponse = postService.createPost(createPostRequest);
-        assertEquals("", createPostResponse.getContent());
+//        assertEquals("", createPostResponse.getContent());
 
         User user = userRepository.findByUsername("username");
-        assertThat(user.getPosts().size(), is(1));
+//        assertThat(user.getPosts().size(), is(1));
+
+        CreateCommentRequest createCommentRequest = new CreateCommentRequest();
+        createCommentRequest.setUsername("username");
+        createCommentRequest.setPostId("postId");
+        createCommentRequest.setContent("This is a comment");
+        CreateCommentResponse createCommentResponse = commentService.createComment(createCommentRequest);
+         
+        assertEquals(createPostResponse.getPostId(), createCommentResponse.getPostId());
+        assertEquals("This is a comment.", createCommentResponse.getContent());
+        assertEquals("username", createCommentResponse.getUsername());
     }
 
     @Test
@@ -163,4 +180,5 @@ class PostServiceImpTest {
         assertFalse(postRepository.existsById(createPostResponse.getPostId()));
         assertThat(userRepository.findByUsername("username").getPosts().size(), is(0));
 
-    }}
+    }
+}

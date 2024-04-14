@@ -1,8 +1,7 @@
 package News.Company.BoboUpdate.Services;
 
-import News.Company.BoboUpdate.Dtos.request.CreatePostRequest;
-import News.Company.BoboUpdate.Dtos.response.CreatePostResponse;
+import News.Company.BoboUpdate.Data.Model.View;
 
 public interface ViewService {
-    CreatePostResponse viewPost(CreatePostRequest createPostRequest);
+    View addView(String userId, String postId);
 }

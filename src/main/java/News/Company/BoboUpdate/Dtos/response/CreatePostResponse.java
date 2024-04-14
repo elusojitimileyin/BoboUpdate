@@ -9,7 +9,6 @@ public class CreatePostResponse {
     private String postId;
     private String title;
     private String content;
-//    private LocalDateTime dateCreated = LocalDateTime.now();
-    private String dateCreated;
+     private LocalDateTime dateCreated = LocalDateTime.now();
 }
 

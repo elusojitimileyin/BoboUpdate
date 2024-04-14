@@ -6,8 +6,10 @@ import News.Company.BoboUpdate.Data.Repositories.UserRepository;
 import News.Company.BoboUpdate.Dtos.request.LoginUserRequest;
 import News.Company.BoboUpdate.Dtos.request.LogoutUserRequest;
 import News.Company.BoboUpdate.Dtos.request.RegisterUserRequest;
+import News.Company.BoboUpdate.Dtos.request.UpdateUserRequest;
 import News.Company.BoboUpdate.Dtos.response.LoginUserResponse;
 import News.Company.BoboUpdate.Dtos.response.LogoutUserResponse;
+import News.Company.BoboUpdate.Dtos.response.RegisterUserResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,14 +106,6 @@ class UserServiceImpTest {
         LoginUserRequest loginRequest = new LoginUserRequest();
         loginRequest.setUsername("fela");
         loginRequest.setPassword("onigbo");
-
-//        try{
-//            userServices.login(loginRequest);
-//
-//        } catch (BoboUpdateException message){
-//            assertEquals("User with username fela not found", message.getMessage());
-//
-//        }
         assertThrows(BoboUpdateException.class, () -> userServices.login(loginRequest));
         assertThat(userRepository.count(), is(0L));
     }
@@ -136,7 +130,6 @@ void testThatUserCannotLoginWithWrongPasswordAfterRegistration() {
     userRegisterRequest.setLastName("lastName");
     userServices.registerUser(userRegisterRequest);
     assertThat(userRepository.count(), is(1L));
-
     LoginUserRequest loginRequest = new LoginUserRequest();
     loginRequest.setUsername("username");
     loginRequest.setPassword("wrongPassword");
@@ -149,4 +142,23 @@ void testThatUserCannotLoginWithWrongPasswordAfterRegistration() {
     assertThat(userRepository.count(), is(1L));
 }
 
+    @Test
+    public void registerOneUser_UpdateUser() {
+        RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
+        userRegisterRequest.setUsername("username");
+        userRegisterRequest.setPassword("password");
+        userRegisterRequest.setFirstName("firstName");
+        userRegisterRequest.setLastName("lastName");
+
+        RegisterUserResponse registerUserResponse = userServices.registerUser(userRegisterRequest);
+        assertEquals(1, userRepository.count());
+
+        UpdateUserRequest updateUserRequest = new UpdateUserRequest();
+        updateUserRequest.setUserId(registerUserResponse.getId());
+        updateUserRequest.setUsername("username1");
+        updateUserRequest.setFirstname("firstName1");
+        updateUserRequest.setLastname("lastName1");
+        userServices.updateUserBio(updateUserRequest);
+        assertEquals(1, userRepository.count());
+    }
 }

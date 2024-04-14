@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 public class CommentServiceImp implements CommentService {
     @Autowired
@@ -29,34 +30,47 @@ public class CommentServiceImp implements CommentService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ViewService viewService;
+//    @Autowired
+//    private LikeService likeService;
 
 
     @Override
-    public List<Comment> getCommentBy(String postId){
-        Post post = postRepository.findById(postId).orElseThrow(()-> new PostNotFoundException("Post not found")) ;
-        return  commentRepository.findByPostId(post.getId());
+    public List<Comment> getComment(String postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Post not found"));
+        return commentRepository.findByPostId(post.getId());
     }
 
     @Override
-    public List<Comment> getCommentsByUser(String postId, String userId){
-        User user = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found"));
-        Post post = postRepository.findById(postId).orElseThrow(()-> new PostNotFoundException("Post not found")) ;
-        return  commentRepository.findByPostId(post.getId());
+    public List<Comment> getCommentsByUser(String postId, String userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return commentRepository.findByUserId(user.getId());
     }
 
 
     @Override
-    public CreateCommentResponse createCommentWith(CreateCommentRequest createCommentRequest) {
-        User user = findUserBy(createCommentRequest.getUsername());
+    public CreateCommentResponse createComment(CreateCommentRequest createCommentRequest) {
+        User user = findUserByUsername(createCommentRequest.getUsername());
 
         Post post = postRepository.findById(createCommentRequest.getPostId())
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
+
         Comment newComment = new Comment();
         newComment.setUserId(user.getId());
-        newComment.setPost(post);
         newComment.setComment(createCommentRequest.getContent());
+        newComment.setPostId(post.getId());
         commentRepository.save(newComment);
+        post.getComments().add(newComment);
+        postRepository.save(post);
+        if (!user.getId().equals(post.getUserId())) {
+            viewService.addView(user.getId(), post.getId());
+        }
+
+//        if (!user.getId().equals(post.getUserId())) {
+//            likeService.addLikePost(user.getId(), post.getId());
+//        }
 
         CreateCommentResponse response = new CreateCommentResponse();
         response.setPostId(post.getId());
@@ -66,19 +80,18 @@ public class CommentServiceImp implements CommentService {
     }
 
 
-
     @Override
-    public EditCommentResponse editCommentWith(EditCommentRequest createCommentRequest) {
+    public EditCommentResponse editComment(EditCommentRequest createCommentRequest) {
 
         Post post = postRepository.findById(createCommentRequest.getPostId())
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
 
-        Comment comment = commentRepository.findByPostAndUserId(post, createCommentRequest.getUsername())
+        Comment comment = commentRepository.findByPostIdAndUserId(post.getId(), post.getUserId())
                 .orElseThrow(() -> new BoboUpdateException("Comment not found for postId: "));
 
-
-        if (!createCommentRequest.getUsername().equals(comment.getUserId())) {
+        User user = userRepository.findByUsername(createCommentRequest.getUsername());
+        if (!user.getId().equals(comment.getUserId())) {
             throw new UserNotFoundException("User does not have permission to edit this comment");
         }
 
@@ -95,17 +108,16 @@ public class CommentServiceImp implements CommentService {
     }
 
 
-
     @Override
-    public DeleteCommentResponse deleteCommentWith(DeleteCommentRequest deleteCommentRequest) {
-        User user = findUserBy(deleteCommentRequest.getUsername());
+    public DeleteCommentResponse deleteComment(DeleteCommentRequest deleteCommentRequest) {
+        User user = findUserByUsername(deleteCommentRequest.getUsername());
         Comment comment = commentRepository.findById(deleteCommentRequest.getCommentId())
                 .orElseThrow(() -> new BoboUpdateException("Comment not found"));
 
         if (!user.getId().equals(comment.getUserId())) {
             throw new UserNotFoundException("You are not authorized to delete this post");
         }
-        Post post = comment.getPost();
+        Post post = postRepository.findById(comment.getPostId()).get();
         post.getComments().remove(comment);
         postRepository.save(post);
         commentRepository.delete(comment);
@@ -113,7 +125,7 @@ public class CommentServiceImp implements CommentService {
     }
 
     @Override
-    public User findUserBy(String username) {
+    public User findUserByUsername(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UserNotFoundException("User with username " + username + " not found");

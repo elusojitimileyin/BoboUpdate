@@ -13,16 +13,16 @@ import java.util.List;
 
 public interface CommentService {
 
-    User findUserBy(String username);
-
-    List<Comment> getCommentBy(String postId);
+    List<Comment> getComment(String postId);
 
     List<Comment> getCommentsByUser(String postId, String userId);
 
-    CreateCommentResponse createCommentWith(CreateCommentRequest createCommentRequest);
+    CreateCommentResponse createComment(CreateCommentRequest createCommentRequest);
 
-    EditCommentResponse editCommentWith(EditCommentRequest createCommentRequest);
+    EditCommentResponse editComment(EditCommentRequest createCommentRequest);
 
 
-    DeleteCommentResponse deleteCommentWith(DeleteCommentRequest deleteCommentRequest);
+    DeleteCommentResponse deleteComment(DeleteCommentRequest deleteCommentRequest);
+
+    User findUserByUsername(String username);
 }

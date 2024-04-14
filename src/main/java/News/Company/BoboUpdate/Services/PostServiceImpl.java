@@ -28,7 +28,7 @@ public class PostServiceImpl implements PostService {
     private UserRepository userRepository;
 
     @Override
-    public CreatePostResponse createPostWith(CreatePostRequest createPostRequest) {
+    public CreatePostResponse createPost(CreatePostRequest createPostRequest) {
         User foundUser = findUserBy(createPostRequest.getUsername());
 
         Post newPost = new Post();
@@ -45,7 +45,7 @@ public class PostServiceImpl implements PostService {
         response.setPostId(savedPost.getId());
         response.setTitle(savedPost.getTitle());
         response.setContent(savedPost.getContent());
-        response.setDateCreated(savedPost.getDateTimeCreated().toString());
+        response.setDateCreated(savedPost.getDateTimeCreated());
         return response;
     }
 

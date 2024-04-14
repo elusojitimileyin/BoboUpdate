@@ -12,7 +12,7 @@ import News.Company.BoboUpdate.Dtos.response.EditPostResponse;
 import java.util.List;
 
 public interface PostService {
-    CreatePostResponse createPostWith(CreatePostRequest createPostRequest);
+    CreatePostResponse createPost(CreatePostRequest createPostRequest);
 
     EditPostResponse edit(EditPostRequest editPostRequest);
 

@@ -23,4 +23,6 @@ public class Post {
     private List<View> views = new ArrayList<>();
     @DBRef
     private List<Comment> comments = new ArrayList<>();
+//    @DBRef
+//    private List<Like> likes = new ArrayList<>();
 }

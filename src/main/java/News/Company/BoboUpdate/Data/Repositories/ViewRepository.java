@@ -8,8 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ViewRepository extends MongoRepository<View,String> {
-    List<View> findAllByUsernameAndTitleAndContent(String username, String title, String content);
-
-    boolean existsByTitleIgnoreCase(String title);
+    View findByPostId(String postId);
 }
 
