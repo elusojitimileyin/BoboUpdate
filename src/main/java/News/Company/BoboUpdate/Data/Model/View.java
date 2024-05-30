@@ -1,5 +1,6 @@
 package News.Company.BoboUpdate.Data.Model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -12,6 +13,8 @@ import java.util.Set;
 
 @Data
 @Document("Views")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class View {
     @Id
     private String postId;

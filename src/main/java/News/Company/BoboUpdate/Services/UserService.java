@@ -10,14 +10,18 @@ import News.Company.BoboUpdate.Dtos.response.LogoutUserResponse;
 import News.Company.BoboUpdate.Dtos.response.RegisterUserResponse;
 import News.Company.BoboUpdate.Dtos.response.UpdateUserResponse;
 
+import java.util.List;
+
 public interface UserService {
     RegisterUserResponse registerUser(RegisterUserRequest signUpRequest);
 
-    LoginUserResponse login(LoginUserRequest loginUserRequest);
+    LoginUserResponse loginUser(LoginUserRequest loginUserRequest);
 
-    LogoutUserResponse logout(LogoutUserRequest logoutUserRequest);
+    LogoutUserResponse logoutUser(LogoutUserRequest logoutUserRequest);
 
     User findUserBy(String username);
 
-    UpdateUserResponse updateUserBio(UpdateUserRequest updateUserRequest);
+    List<User> getAllUser();
+
+    UpdateUserResponse updateUser(UpdateUserRequest updateUserRequest);
 }

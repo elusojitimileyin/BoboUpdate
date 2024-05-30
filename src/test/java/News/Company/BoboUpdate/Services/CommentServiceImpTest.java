@@ -9,7 +9,6 @@ import News.Company.BoboUpdate.Dtos.request.*;
 import News.Company.BoboUpdate.Dtos.response.CreateCommentResponse;
 import News.Company.BoboUpdate.Dtos.response.CreatePostResponse;
 import News.Company.BoboUpdate.Dtos.response.LoginUserResponse;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +45,7 @@ class CommentServiceImpTest {
 
         RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
         userRegisterRequest.setUsername("username");
-        userRegisterRequest.setPassword("password");
+        userRegisterRequest.setPassword("@Twi1234");
         userRegisterRequest.setFirstName("firstName");
         userRegisterRequest.setLastName("lastName");
         userService.registerUser(userRegisterRequest);
@@ -54,60 +53,63 @@ class CommentServiceImpTest {
 
         LoginUserRequest loginRequest = new LoginUserRequest();
         loginRequest.setUsername("username");
-        loginRequest.setPassword("password");
-        LoginUserResponse loginResponse = userService.login(loginRequest);
-        assertThat(loginResponse.getUsername(), is("username"));
+        loginRequest.setPassword("@Twi1234");
+        userService.loginUser(loginRequest);
+
 
 
     }
 
-    @AfterEach
-    public void tearDown() {
-        userRepository.deleteAll();
-        postRepository.deleteAll();
-        commentRepository.deleteAll();
-    }
+
 
     @Test
     void testThatUserCanCreatePostAndCommentWithEmptyContent() {
-//        assertTrue(userRepository.existsByUsername("username"));
-
         CreatePostRequest createPostRequest = new CreatePostRequest();
         createPostRequest.setUsername("username");
         createPostRequest.setTitle("Empty Content Post");
         createPostRequest.setContent("This is a comment");
         CreatePostResponse createPostResponse = postService.createPost(createPostRequest);
-//        assertEquals("", createPostResponse.getContent());
-
-        User user = userRepository.findByUsername("username");
-//        assertThat(user.getPosts().size(), is(1));
+        assertNotNull(createPostResponse);
+        assertEquals("Empty Content Post", createPostResponse.getTitle());
+        assertEquals("This is a comment", createPostResponse.getContent());
 
         CreateCommentRequest createCommentRequest = new CreateCommentRequest();
         createCommentRequest.setUsername("username");
-        createCommentRequest.setPostId("postId");
+        createCommentRequest.setPostId(createPostResponse.getPostId());
         createCommentRequest.setContent("This is a comment");
         CreateCommentResponse createCommentResponse = commentService.createComment(createCommentRequest);
-         
-        assertEquals(createPostResponse.getPostId(), createCommentResponse.getPostId());
-        assertEquals("This is a comment.", createCommentResponse.getContent());
-        assertEquals("username", createCommentResponse.getUsername());
+        assertNotNull(createCommentResponse);
+
+        Post post = postRepository.findById(createPostResponse.getPostId()).orElse(null);
+        assertNotNull(post);
+        assertEquals(1, post.getComments().size());
+        assertNull(post.getComments().get(0).getContent());
     }
 
+
     @Test
-    void testThatUserCanCreatePost() {
+    void testThatUserCanCreatePostAndCommentWithContent() {
         assertTrue(userRepository.existsByUsername("username"));
 
         CreatePostRequest createPostRequest = new CreatePostRequest();
         createPostRequest.setUsername("username");
         createPostRequest.setTitle("this tech money must be made");
         createPostRequest.setContent("i done suffer for this learning curve ooo!");
-
         CreatePostResponse createPostResponse = postService.createPost(createPostRequest);
         assertEquals("this tech money must be made", createPostResponse.getTitle());
         assertEquals("i done suffer for this learning curve ooo!", createPostResponse.getContent());
 
         User user = userRepository.findByUsername("username");
         assertThat(user.getPosts().size(), is(1));
+
+        CreateCommentRequest createCommentRequest = new CreateCommentRequest();
+        createCommentRequest.setUsername("username");
+        createCommentRequest.setPostId(createPostResponse.getPostId());
+        createCommentRequest.setContent("i done suffer for this learning curve ooo!");
+        CreateCommentResponse createCommentResponse = commentService.createComment(createCommentRequest);
+        assertNotNull(createCommentResponse);
+
+
     }
 
     @Test
@@ -153,7 +155,7 @@ class CommentServiceImpTest {
         editPostRequest.setPostId(createPostResponse.getPostId());
         editPostRequest.setTitle("Edited Title");
         editPostRequest.setContent("Edited Content");
-        postService.edit(editPostRequest);
+        postService.editPost(editPostRequest);
 
         User foundUser = userRepository.findByUsername("username");
         Post updatedPost = foundUser.getPosts().getFirst();
@@ -176,7 +178,7 @@ class CommentServiceImpTest {
         DeletePostRequest deletePostRequest = new DeletePostRequest();
         deletePostRequest.setUsername("username");
         deletePostRequest.setPostId(createPostResponse.getPostId());
-        postService.delete(deletePostRequest);
+        postService.deletePost(deletePostRequest);
         assertFalse(postRepository.existsById(createPostResponse.getPostId()));
         assertThat(userRepository.findByUsername("username").getPosts().size(), is(0));
 

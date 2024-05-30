@@ -14,13 +14,14 @@ import java.util.List;
 public interface PostService {
     CreatePostResponse createPost(CreatePostRequest createPostRequest);
 
-    EditPostResponse edit(EditPostRequest editPostRequest);
+    EditPostResponse editPost(EditPostRequest editPostRequest);
 
-    DeletePostResponse delete(DeletePostRequest deletePostRequest);
+    DeletePostResponse deletePost(DeletePostRequest deletePostRequest);
 
     User findUserBy(String username);
 
-    List<Post> getUserPost(String username);
+
+    List<Post> getAllUsersPost();
 
 
 }

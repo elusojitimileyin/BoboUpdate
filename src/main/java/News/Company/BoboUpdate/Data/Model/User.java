@@ -1,5 +1,6 @@
 package News.Company.BoboUpdate.Data.Model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -13,6 +14,8 @@ import java.util.List;
 @Data
 @Document("Users")
 @RequiredArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class User {
     @Id
     private String id;

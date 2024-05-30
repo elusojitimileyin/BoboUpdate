@@ -14,7 +14,6 @@ public class ViewServiceImpl implements ViewService {
     @Autowired
     private ViewRepository viewRepository;
 
-
     @Override
     public View  addView(String userId, String postId) {
         View view = viewRepository.findByPostId(postId);

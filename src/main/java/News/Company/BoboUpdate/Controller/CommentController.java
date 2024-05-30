@@ -1,7 +1,7 @@
 package News.Company.BoboUpdate.Controller;
 
 
-import News.Company.BoboUpdate.BoboUpdateException.BoboUpdateException;
+import News.Company.BoboUpdate.Utils.BoboUpdateException;
 import News.Company.BoboUpdate.Dtos.request.CreateCommentRequest;
 import News.Company.BoboUpdate.Dtos.response.ApiResponse;
 import News.Company.BoboUpdate.Services.CommentService;
@@ -28,4 +28,5 @@ public class CommentController {
             return new ResponseEntity<>(new ApiResponse(false, message.getMessage()), BAD_REQUEST);
         }
     }
+
 }

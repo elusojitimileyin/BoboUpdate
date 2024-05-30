@@ -7,7 +7,7 @@ import News.Company.BoboUpdate.Data.Repositories.UserRepository;
 import News.Company.BoboUpdate.Dtos.request.*;
 import News.Company.BoboUpdate.Dtos.response.CreatePostResponse;
 import News.Company.BoboUpdate.Dtos.response.LoginUserResponse;
-import org.junit.jupiter.api.AfterEach;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ class PostServiceImpTest {
 
         RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
         userRegisterRequest.setUsername("username");
-        userRegisterRequest.setPassword("password");
+        userRegisterRequest.setPassword("@Twi1234");
         userRegisterRequest.setFirstName("firstName");
         userRegisterRequest.setLastName("lastName");
         userService.registerUser(userRegisterRequest);
@@ -46,20 +46,12 @@ class PostServiceImpTest {
 
         LoginUserRequest loginRequest = new LoginUserRequest();
         loginRequest.setUsername("username");
-        loginRequest.setPassword("password");
-        LoginUserResponse loginResponse = userService.login(loginRequest);
+        loginRequest.setPassword("@Twi1234");
+        LoginUserResponse loginResponse = userService.loginUser(loginRequest);
         assertThat(loginResponse.getUsername(), is("username"));
 
-
-
-
     }
 
-    @AfterEach
-    public void tearDown() {
-        userRepository.deleteAll();
-        postRepository.deleteAll();
-    }
 
     @Test
     void testThatUserCanCreatePostWithEmptyContent() {
@@ -136,7 +128,7 @@ class PostServiceImpTest {
         editPostRequest.setPostId(createPostResponse.getPostId());
         editPostRequest.setTitle("Edited Title");
         editPostRequest.setContent("Edited Content");
-        postService.edit(editPostRequest);
+        postService.editPost(editPostRequest);
 
         User foundUser = userRepository.findByUsername("username");
         Post updatedPost = foundUser.getPosts().getFirst();
@@ -159,7 +151,7 @@ class PostServiceImpTest {
         DeletePostRequest deletePostRequest = new DeletePostRequest();
         deletePostRequest.setUsername("username");
         deletePostRequest.setPostId(createPostResponse.getPostId());
-        postService.delete(deletePostRequest);
+        postService.deletePost(deletePostRequest);
         assertFalse(postRepository.existsById(createPostResponse.getPostId()));
         assertThat(userRepository.findByUsername("username").getPosts().size(), is(0));
 

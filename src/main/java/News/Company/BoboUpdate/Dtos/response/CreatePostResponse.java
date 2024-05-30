@@ -1,14 +1,17 @@
 package News.Company.BoboUpdate.Dtos.response;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Setter
+@Getter
 public class CreatePostResponse {
     private String postId;
     private String title;
     private String content;
-     private LocalDateTime dateCreated = LocalDateTime.now();
+     private LocalDateTime dateTimeCreated = LocalDateTime.now();
 }
 

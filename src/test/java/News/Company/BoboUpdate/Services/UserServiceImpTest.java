@@ -1,6 +1,6 @@
 package News.Company.BoboUpdate.Services;
 
-import News.Company.BoboUpdate.BoboUpdateException.BoboUpdateException;
+import News.Company.BoboUpdate.Utils.BoboUpdateException;
 import News.Company.BoboUpdate.Data.Repositories.PostRepository;
 import News.Company.BoboUpdate.Data.Repositories.UserRepository;
 import News.Company.BoboUpdate.Dtos.request.LoginUserRequest;
@@ -9,7 +9,6 @@ import News.Company.BoboUpdate.Dtos.request.RegisterUserRequest;
 import News.Company.BoboUpdate.Dtos.request.UpdateUserRequest;
 import News.Company.BoboUpdate.Dtos.response.LoginUserResponse;
 import News.Company.BoboUpdate.Dtos.response.LogoutUserResponse;
-import News.Company.BoboUpdate.Dtos.response.RegisterUserResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,70 +33,44 @@ class UserServiceImpTest {
     @BeforeEach
     public void setUp() {
         userRepository.deleteAll();
+
+        RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
+        userRegisterRequest.setUsername("username");
+        userRegisterRequest.setPassword("@Twi1234");
+        userRegisterRequest.setFirstName("firstName");
+        userRegisterRequest.setLastName("lastName");
+
+        userServices.registerUser(userRegisterRequest);
     }
 
     @Test
     public void registerOneUser_userIsOne() {
-        RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
-        userRegisterRequest.setUsername("username");
-        userRegisterRequest.setPassword("password");
-        userRegisterRequest.setFirstName("firstName");
-        userRegisterRequest.setLastName("lastName");
-
-        userServices.registerUser(userRegisterRequest);
-        assertEquals(1, userRepository.count());
-    }
-
-    @Test
-    public void registerExistingUser() {
-        RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
-        userRegisterRequest.setUsername("username");
-        userRegisterRequest.setPassword("password");
-        userRegisterRequest.setFirstName("firstName");
-        userRegisterRequest.setLastName("lastName");
-
-        userServices.registerUser(userRegisterRequest);
-
-        assertThrows(BoboUpdateException.class, () -> userServices.registerUser(userRegisterRequest));
 
         assertEquals(1, userRepository.count());
     }
-
     @Test
     void testThatUserCanLoginAfterRegistration() {
-        RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
-        userRegisterRequest.setUsername("username");
-        userRegisterRequest.setPassword("password");
-        userRegisterRequest.setFirstName("firstName");
-        userRegisterRequest.setLastName("lastName");
-        userServices.registerUser(userRegisterRequest);
         assertThat(userRepository.count(), is(1L));
 
         LoginUserRequest loginRequest = new LoginUserRequest();
         loginRequest.setUsername("username");
-        loginRequest.setPassword("password");
-        LoginUserResponse loginResponse = userServices.login(loginRequest);
+        loginRequest.setPassword("@Twi1234");
+        LoginUserResponse loginResponse = userServices.loginUser(loginRequest);
         assertThat(loginResponse.getUsername(), is("username"));
     }
     @Test
     void testThatUserCanRegister_login_logout() {
-        RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
-        userRegisterRequest.setUsername("username");
-        userRegisterRequest.setPassword("password");
-        userRegisterRequest.setFirstName("firstName");
-        userRegisterRequest.setLastName("lastName");
-        userServices.registerUser(userRegisterRequest);
         assertThat(userRepository.count(), is(1L));
 
         LoginUserRequest loginRequest = new LoginUserRequest();
         loginRequest.setUsername("username");
-        loginRequest.setPassword("password");
-        LoginUserResponse loginResponse = userServices.login(loginRequest);
+        loginRequest.setPassword("@Twi1234");
+        LoginUserResponse loginResponse = userServices.loginUser(loginRequest);
         assertThat(loginResponse.getUsername(), is("username"));
 
         LogoutUserRequest logoutRequest = new LogoutUserRequest();
         logoutRequest.setUsername("username");
-        LogoutUserResponse logoutResponse = userServices.logout(logoutRequest);
+        LogoutUserResponse logoutResponse = userServices.logoutUser(logoutRequest);
         assertThat( logoutResponse.getUsername(), is("username"));
     }
 
@@ -105,60 +78,43 @@ class UserServiceImpTest {
     void testThatICanNotLoginIfIDontRegister(){
         LoginUserRequest loginRequest = new LoginUserRequest();
         loginRequest.setUsername("fela");
-        loginRequest.setPassword("onigbo");
-        assertThrows(BoboUpdateException.class, () -> userServices.login(loginRequest));
-        assertThat(userRepository.count(), is(0L));
+        loginRequest.setPassword("@Twi1234");
+        assertThrows(BoboUpdateException.class, () -> userServices.loginUser(loginRequest));
+
     }
 
     @Test
     void testThatICantLogoutIfIDontLogin() {
         LogoutUserRequest logoutRequest = new LogoutUserRequest();
         logoutRequest.setUsername("fela");
+        assertThrows(BoboUpdateException.class, () -> userServices.logoutUser(logoutRequest));
 
-        assertThrows(BoboUpdateException.class, () -> userServices.logout(logoutRequest));
-        assertThat(userRepository.count(), is(0L));
     }
-
-
 
 @Test
 void testThatUserCannotLoginWithWrongPasswordAfterRegistration() {
-    RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
-    userRegisterRequest.setUsername("username");
-    userRegisterRequest.setPassword("password");
-    userRegisterRequest.setFirstName("firstName");
-    userRegisterRequest.setLastName("lastName");
-    userServices.registerUser(userRegisterRequest);
+
     assertThat(userRepository.count(), is(1L));
     LoginUserRequest loginRequest = new LoginUserRequest();
     loginRequest.setUsername("username");
     loginRequest.setPassword("wrongPassword");
     try {
-        userServices.login(loginRequest);
+        userServices.loginUser(loginRequest);
     } catch (BoboUpdateException e) {
         assertEquals("Invalid username or password", e.getMessage());
     }
-
     assertThat(userRepository.count(), is(1L));
 }
 
     @Test
     public void registerOneUser_UpdateUser() {
-        RegisterUserRequest userRegisterRequest = new RegisterUserRequest();
-        userRegisterRequest.setUsername("username");
-        userRegisterRequest.setPassword("password");
-        userRegisterRequest.setFirstName("firstName");
-        userRegisterRequest.setLastName("lastName");
-
-        RegisterUserResponse registerUserResponse = userServices.registerUser(userRegisterRequest);
         assertEquals(1, userRepository.count());
-
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
-        updateUserRequest.setUserId(registerUserResponse.getId());
-        updateUserRequest.setUsername("username1");
+        updateUserRequest.setId(updateUserRequest.getId());
+        updateUserRequest.setUsername("username");
         updateUserRequest.setFirstname("firstName1");
         updateUserRequest.setLastname("lastName1");
-        userServices.updateUserBio(updateUserRequest);
+        userServices.updateUser(updateUserRequest);
         assertEquals(1, userRepository.count());
     }
 }

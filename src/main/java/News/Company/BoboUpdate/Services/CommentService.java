@@ -9,13 +9,13 @@ import News.Company.BoboUpdate.Dtos.response.CreateCommentResponse;
 import News.Company.BoboUpdate.Dtos.response.DeleteCommentResponse;
 import News.Company.BoboUpdate.Dtos.response.EditCommentResponse;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface CommentService {
 
-    List<Comment> getComment(String postId);
+    Optional<Comment> getComment(String postId);
 
-    List<Comment> getCommentsByUser(String postId, String userId);
+    Optional<Comment> getCommentsByUser(String postId, String userId);
 
     CreateCommentResponse createComment(CreateCommentRequest createCommentRequest);
 
